@@ -1,0 +1,6 @@
+sos_rs_venv
+.vscode
+__pycache__
+*.json
+*.csv
+*.xlsx
