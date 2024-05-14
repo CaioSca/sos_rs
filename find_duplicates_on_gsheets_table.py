@@ -32,12 +32,12 @@ def cluster_labels(df_cadastro_abrigos_preenchidos: pd.DataFrame, column_label: 
     return labels
 
 
-def main(modelos, colunas_labels_analisar, colunas_limpar_nulos, nomes_arquivos):
-    df = modelos.get_spreadsheet_table()
+def main(modelo, coluna_label, coluna_ref_limpar_nulo, nome_arquivo):
+    df = modelo.get_spreadsheet_table()
     
-    df_preenchidos = df[df[colunas_limpar_nulos] != '']
+    df_preenchidos = df[df[coluna_ref_limpar_nulo] != '']
 
-    df_preenchidos['nome_normalizado'] = df_preenchidos[colunas_labels_analisar].apply(normalize_strings)
+    df_preenchidos['nome_normalizado'] = df_preenchidos[coluna_label].apply(normalize_strings)
 
     labels = cluster_labels(df_preenchidos, 'nome_normalizado')
 
@@ -45,7 +45,7 @@ def main(modelos, colunas_labels_analisar, colunas_limpar_nulos, nomes_arquivos)
     df_preenchidos.sort_values(by='agrupamentos', inplace=True)
     
     date_now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    file_name = f'{nomes_arquivos}_{date_now}.xlsx'
+    file_name = f'{nome_arquivo}_{date_now}.xlsx'
     df_preenchidos.to_excel(file_name, index=False)
 
     upload_file_to_drive(file_name, '1wCQQtuS0M-Qbq2cwHJXE9ncfhzFvDYAT')
@@ -53,15 +53,15 @@ def main(modelos, colunas_labels_analisar, colunas_limpar_nulos, nomes_arquivos)
 
 
 modelos = [FormularioNovosAbrigos, PlanilhaCentral, SOSMinutoAMinuto]
-colunas_limpar_nulos = ['Carimbo de data/hora', 'NOME DA INSTITUIÇÃO', 'Nome do Abrigo']
+colunas_ref_limpar_nulos = ['Carimbo de data/hora', 'NOME DA INSTITUIÇÃO', 'Nome do Abrigo']
 colunas_labels_analisar = ['NOME', 'NOME DA INSTITUIÇÃO', 'Nome do Abrigo']
 nomes_arquivos = ['sos_rs_forms_cadastro_novos_abrigos', 'sos_rs_forms_planilha_central', 'sos_rs_minuto_a_minuto']
 
-for modelo, coluna_limpar_nulo, coluna_label, nome_arquivo in zip(
+for modelo, coluna_ref_limpar_nulo, coluna_label, nome_arquivo in zip(
     modelos, 
-    colunas_limpar_nulos, 
+    colunas_ref_limpar_nulos, 
     colunas_labels_analisar, 
     nomes_arquivos
     ):
-    main(modelo, coluna_label, coluna_limpar_nulo, nome_arquivo)
+    main(modelo, coluna_label, coluna_ref_limpar_nulo, nome_arquivo)
 
